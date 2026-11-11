@@ -360,8 +360,8 @@
     const kartu = adalah('USER')
       ? [['Pengajuan Saya', all.length, 'mail', 'seluruh pengajuan'], ['Sedang Diproses', n(['DIAJUKAN', 'DIPROSES', 'MENUNGGU_VERIFIKASI']), 'clock', 'admin dan pimpinan'], ['Terbit', n(['TERBIT']), 'shield', 'siap diunduh'], ['Ditolak', n(['DITOLAK', 'DIBATALKAN']), 'alert', 'lihat catatan']]
       : [['Total Surat', all.length, 'file', 'seluruh arsip'], ['Menunggu Diproses', n(['DIAJUKAN', 'DIPROSES']), 'clock', 'perlu penomoran admin'], ['Menunggu Verifikasi', n(['MENUNGGU_VERIFIKASI']), 'edit', 'antrean pimpinan'], ['Surat Terbit', n(['TERBIT']), 'shield', 'siap unduh dan ber-QR']];
-    // Warna kartu ringkasan mengikuti makna: kuning = menunggu, ungu = verifikasi, hijau = terbit, merah = ditolak
-    const tinta = adalah('USER') ? ['', 'kuning', 'hijau', 'merah'] : ['', 'kuning', 'ungu', 'hijau'];
+    // Warna kartu ringkasan mengikuti makna: kuning = menunggu, langit = verifikasi, hijau = terbit, merah = ditolak
+    const tinta = adalah('USER') ? ['', 'kuning', 'hijau', 'merah'] : ['', 'kuning', 'langit', 'hijau'];
     let kanan;
     if (adalah('PIMPINAN')) {
       const q = all.filter(s => s.status === 'MENUNGGU_VERIFIKASI' && s.pejabat_email === S.user.email);
@@ -523,7 +523,7 @@
     const rata = jam.length ? jam.reduce((a, b) => a + b, 0) / jam.length : null;
     return `<div class="stat4"><div class="kartu stat tinta biru"><span class="ubin">${ic('file')}</span><p>Total permohonan</p><b>${list.length}</b><small>sesuai filter</small></div>
         <div class="kartu stat sorot"><span class="ubin">${ic('shield')}</span><p>Surat terbit</p><b>${terbit.length}</b><small>${list.length ? Math.round(terbit.length / list.length * 100) : 0}% dari permohonan</small></div>
-        <div class="kartu stat tinta ungu"><span class="ubin">${ic('clock')}</span><p>Rata-rata waktu proses</p><b>${rata === null ? '—' : rata < 48 ? rata.toFixed(1) + ' jam' : (rata / 24).toFixed(1) + ' hari'}</b><small>pengajuan sampai terbit</small></div>
+        <div class="kartu stat tinta langit"><span class="ubin">${ic('clock')}</span><p>Rata-rata waktu proses</p><b>${rata === null ? '—' : rata < 48 ? rata.toFixed(1) + ' jam' : (rata / 24).toFixed(1) + ' hari'}</b><small>pengajuan sampai terbit</small></div>
         <div class="kartu stat tinta merah"><span class="ubin">${ic('alert')}</span><p>Ditolak atau dibatalkan</p><b>${gagal}</b><small>${list.length ? Math.round(gagal / list.length * 100) : 0}% dari permohonan</small></div></div>
       <div class="dash"><div class="kiri"><div class="kartu"><div class="kj"><div><h2>Tren Pengajuan dan Penerbitan</h2><p>Tahun ${esc(f.tahun)}</p></div></div>${grafikBulan(list, Number(f.tahun))}</div></div>
         <div class="kanan"><div class="kartu"><div class="kj"><div><h2>Sebaran Jenis Surat</h2><p>Sesuai filter</p></div></div>${donutJenis(list)}</div></div></div>
