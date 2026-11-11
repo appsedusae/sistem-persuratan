@@ -77,6 +77,14 @@ code { background: #EEF0FF; color: #3730A3; padding: 1px 6px; border-radius: 6px
 .stat > b { font-size: 32px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; display: block; }
 .stat.sorot { background: linear-gradient(135deg, var(--aksen), var(--aksen2)); color: #fff; border-color: transparent; box-shadow: 0 10px 24px -4px rgba(30, 58, 138, .35); }
 .stat.sorot p, .stat.sorot small { color: rgba(255, 255, 255, .85); }
+/* Kartu ringkasan berwarna pastel: kuning (menunggu), ungu (verifikasi), hijau (terbit). Mengikuti urutan kartu di dashboard. */
+.dash .stat:not(.sorot) { background: linear-gradient(135deg, var(--k-a), var(--k-b)); border-color: var(--k-g); }
+.dash .stat:not(.sorot) .ubin { background: var(--k-u); color: var(--k-t); }
+.dash .stat:not(.sorot) p, .dash .stat:not(.sorot) small { color: var(--k-t); }
+.dash .stat:not(.sorot) > b { color: var(--k-n); }
+.dash .stat4 > .stat:nth-child(2) { --k-a: #FFFBEB; --k-b: #FEF3C7; --k-g: #F8E3A1; --k-u: #FDE68A; --k-t: #854D0E; --k-n: #451A03; }
+.dash .stat4 > .stat:nth-child(3) { --k-a: #F5F3FF; --k-b: #EDE9FE; --k-g: #DDD6FE; --k-u: #DDD6FE; --k-t: #5B21B6; --k-n: #2E1065; }
+.dash .stat4 > .stat:nth-child(4) { --k-a: #F0FDF4; --k-b: #DCFCE7; --k-g: #BBF7D0; --k-u: #BBF7D0; --k-t: #166534; --k-n: #052E16; }
 .ubin { width: 40px; height: 40px; border-radius: 12px; background: var(--rangka); color: var(--aksen); display: grid; place-items: center; flex: none; }
 .sorot .ubin { background: rgba(255, 255, 255, .18); color: #fff; }
 .ubin.hijau { background: #DCFCE7; color: #166534; } .ubin.kuning { background: #FEF3C7; color: #92400E; } .ubin.merahm { background: #FEE2E2; color: #B91C1C; }
