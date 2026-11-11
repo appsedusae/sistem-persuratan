@@ -360,6 +360,8 @@
     const kartu = adalah('USER')
       ? [['Pengajuan Saya', all.length, 'mail', 'seluruh pengajuan'], ['Sedang Diproses', n(['DIAJUKAN', 'DIPROSES', 'MENUNGGU_VERIFIKASI']), 'clock', 'admin dan pimpinan'], ['Terbit', n(['TERBIT']), 'shield', 'siap diunduh'], ['Ditolak', n(['DITOLAK', 'DIBATALKAN']), 'alert', 'lihat catatan']]
       : [['Total Surat', all.length, 'file', 'seluruh arsip'], ['Menunggu Diproses', n(['DIAJUKAN', 'DIPROSES']), 'clock', 'perlu penomoran admin'], ['Menunggu Verifikasi', n(['MENUNGGU_VERIFIKASI']), 'edit', 'antrean pimpinan'], ['Surat Terbit', n(['TERBIT']), 'shield', 'siap unduh dan ber-QR']];
+    // Warna kartu ringkasan mengikuti makna: kuning = menunggu, ungu = verifikasi, hijau = terbit, merah = ditolak
+    const tinta = adalah('USER') ? ['', 'kuning', 'hijau', 'merah'] : ['', 'kuning', 'ungu', 'hijau'];
     let kanan;
     if (adalah('PIMPINAN')) {
       const q = all.filter(s => s.status === 'MENUNGGU_VERIFIKASI' && s.pejabat_email === S.user.email);
@@ -376,7 +378,7 @@
         ${all.slice(0, 5).map(s => `<a class="antre" href="#" data-act="bukaSurat" data-id="${esc(s.id)}"><b>${esc(s.perihal)}</b><span>${esc(s.jenis)} · ${lalu(s.tanggal)}</span>${lencana(s.status)}</a>`).join('') || '<p class="redup">Belum ada pengajuan.</p>'}</div>`;
     }
     return `<div class="dash"><div class="kiri">
-        <div class="stat4">${kartu.map((k, i) => `<div class="kartu stat ${i ? '' : 'sorot'}"><span class="ubin">${ic(k[2])}</span>${!i && delta !== null ? `<em class="delta ${delta < 0 ? 'turun' : ''}">${delta > 0 ? '+' : ''}${delta}%</em>` : ''}
+        <div class="stat4">${kartu.map((k, i) => `<div class="kartu stat ${i ? 'tinta ' + tinta[i] : 'sorot'}"><span class="ubin">${ic(k[2])}</span>${!i && delta !== null ? `<em class="delta ${delta < 0 ? 'turun' : ''}">${delta > 0 ? '+' : ''}${delta}%</em>` : ''}
           <p>${k[0]}</p><b>${k[1]}</b><small>${!i && delta !== null ? 'pengajuan bulan ini vs bulan lalu' : k[3]}</small></div>`).join('')}</div>
         <div class="kartu"><div class="kj"><div><h2>Statistik Surat per Bulan</h2><p>Pengajuan masuk dibanding surat terbit, tahun ${y}</p></div>
           <a class="tb utama" href="#/ajukan">${ic('plus')}Ajukan Surat</a></div>${all.length ? grafikBulan(all, y) : kosong('Belum ada data surat', 'Grafik akan terisi setelah ada pengajuan.', '<a class="tb utama" href="#/ajukan">Ajukan Surat</a>')}</div>
@@ -502,9 +504,9 @@
   }
   HAL.pengguna = function () {
     const f = F('pengguna', { tab: 'semua' }), u = D().pengguna || [], n = st => u.filter(p => p.status === st).length;
-    return `<div class="stat3"><div class="kartu mini"><span class="ubin hijau">${ic('check')}</span><div><b>${n('AKTIF')}</b><small>Akun aktif</small></div></div>
-        <div class="kartu mini"><span class="ubin kuning">${ic('clock')}</span><div><b>${n('MENUNGGU')}</b><small>Menunggu persetujuan</small></div></div>
-        <div class="kartu mini"><span class="ubin merahm">${ic('ban')}</span><div><b>${n('BLOKIR')}</b><small>Diblokir</small></div></div></div>
+    return `<div class="stat3"><div class="kartu mini tinta hijau"><span class="ubin hijau">${ic('check')}</span><div><b>${n('AKTIF')}</b><small>Akun aktif</small></div></div>
+        <div class="kartu mini tinta kuning"><span class="ubin kuning">${ic('clock')}</span><div><b>${n('MENUNGGU')}</b><small>Menunggu persetujuan</small></div></div>
+        <div class="kartu mini tinta merah"><span class="ubin merahm">${ic('ban')}</span><div><b>${n('BLOKIR')}</b><small>Diblokir</small></div></div></div>
       <div class="kartu"><div class="tab">${[['semua', 'Semua Pengguna', u.length], ['menunggu', 'Menunggu Persetujuan', n('MENUNGGU')], ['pejabat', 'Pejabat Penandatangan', (D().pejabat || []).length]].map(t => `<button class="${f.tab === t[0] ? 'on' : ''}" data-act="tabPengguna" data-tab="${t[0]}">${t[1]} <b>${t[2]}</b></button>`).join('')}</div>
         <div class="alat">${f.tab === 'pejabat' ? '<span class="isi-rata"></span>' : `<label class="cari">${ic('search')}<input type="search" placeholder="Cari nama, email, atau asal…" value="${esc(f.q || '')}" data-saring="pengguna.q" aria-label="Cari pengguna"></label>`}
           ${f.tab === 'pejabat' ? `<button class="tb utama" data-act="formPejabat" data-email="">${ic('plus')}Tambah Pejabat</button>` : `<button class="tb utama" data-act="formPengguna">${ic('plus')}Tambah Pengguna</button>`}</div>
@@ -519,10 +521,10 @@
     const terbit = list.filter(s => s.status === 'TERBIT'), gagal = list.filter(s => s.status === 'DITOLAK' || s.status === 'DIBATALKAN').length;
     const jam = terbit.filter(s => s.waktu_verifikasi).map(s => (keTgl(s.waktu_verifikasi) - keTgl(s.tanggal)) / 36e5).filter(x => x >= 0);
     const rata = jam.length ? jam.reduce((a, b) => a + b, 0) / jam.length : null;
-    return `<div class="stat4"><div class="kartu stat"><span class="ubin">${ic('file')}</span><p>Total permohonan</p><b>${list.length}</b><small>sesuai filter</small></div>
+    return `<div class="stat4"><div class="kartu stat tinta biru"><span class="ubin">${ic('file')}</span><p>Total permohonan</p><b>${list.length}</b><small>sesuai filter</small></div>
         <div class="kartu stat sorot"><span class="ubin">${ic('shield')}</span><p>Surat terbit</p><b>${terbit.length}</b><small>${list.length ? Math.round(terbit.length / list.length * 100) : 0}% dari permohonan</small></div>
-        <div class="kartu stat"><span class="ubin">${ic('clock')}</span><p>Rata-rata waktu proses</p><b>${rata === null ? '—' : rata < 48 ? rata.toFixed(1) + ' jam' : (rata / 24).toFixed(1) + ' hari'}</b><small>pengajuan sampai terbit</small></div>
-        <div class="kartu stat"><span class="ubin">${ic('alert')}</span><p>Ditolak atau dibatalkan</p><b>${gagal}</b><small>${list.length ? Math.round(gagal / list.length * 100) : 0}% dari permohonan</small></div></div>
+        <div class="kartu stat tinta ungu"><span class="ubin">${ic('clock')}</span><p>Rata-rata waktu proses</p><b>${rata === null ? '—' : rata < 48 ? rata.toFixed(1) + ' jam' : (rata / 24).toFixed(1) + ' hari'}</b><small>pengajuan sampai terbit</small></div>
+        <div class="kartu stat tinta merah"><span class="ubin">${ic('alert')}</span><p>Ditolak atau dibatalkan</p><b>${gagal}</b><small>${list.length ? Math.round(gagal / list.length * 100) : 0}% dari permohonan</small></div></div>
       <div class="dash"><div class="kiri"><div class="kartu"><div class="kj"><div><h2>Tren Pengajuan dan Penerbitan</h2><p>Tahun ${esc(f.tahun)}</p></div></div>${grafikBulan(list, Number(f.tahun))}</div></div>
         <div class="kanan"><div class="kartu"><div class="kj"><div><h2>Sebaran Jenis Surat</h2><p>Sesuai filter</p></div></div>${donutJenis(list)}</div></div></div>
       <div class="kartu">${alatSaring('laporan', { kanan: `<select data-saring="laporan.tahun" aria-label="Tahun">${tahun.map(t => `<option ${String(f.tahun) === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
