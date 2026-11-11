@@ -49,12 +49,20 @@
   let epoch = 0;
   async function kirim(action, data) {
     if (DEMO) return window.DEMO_API(action, data || {}, S.token);
-    const res = await fetch(window.GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // wajib text/plain agar tidak memicu preflight CORS
-      body: JSON.stringify({ action, data: data || {}, token: S.token })
-    });
-    return res.json();
+    let res;
+    try {
+      res = await fetch(window.GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // wajib text/plain agar tidak memicu preflight CORS
+        body: JSON.stringify({ action, data: data || {}, token: S.token })
+      });
+    } catch (e) {
+      // Galat jaringan atau CORS: biasanya URL salah atau deployment belum berakses "Anyone"
+      throw new Error('Tidak dapat menghubungi server. Periksa GAS_URL di config.js, pastikan deployment Apps Script berakses "Anyone", lalu coba lagi.');
+    }
+    try { return await res.json(); } catch (e) {
+      throw new Error('Server tidak mengembalikan data yang valid. Pastikan memakai URL /exec dari deployment terbaru dan akses "Anyone".');
+    }
   }
   function api(action, data) {
     const baca = /^(boot|log\.list|auth\.config|verifikasi)$/.test(action);
